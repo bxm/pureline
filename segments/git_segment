@@ -92,7 +92,8 @@ function git_segment {
         fi
     fi
 
-    if [ -n "$(git status --porcelain 2> /dev/null)" ]; then
+    #if [ -n "$(git status --porcelain 2> /dev/null)" ]; then
+    if [ $((number_staged + number_conflicts + number_modified + number_untracked)) -gt 0 ]; then
         if [ -n "$PL_GIT_DIRTY_FG" ]; then
             fg_color="$PL_GIT_DIRTY_FG"
         fi

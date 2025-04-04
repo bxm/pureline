@@ -4,7 +4,7 @@
 
 # Set default symbols if not already defined in config
 # Defaults should be standard symbols.
-[[ -z ${PL_SYMBOLS[git_branch]} ]] && PL_SYMBOLS[git_branch]="╬" 
+[[ -z ${PL_SYMBOLS[git_branch]} ]] && PL_SYMBOLS[git_branch]="╬"
 [[ -z ${PL_SYMBOLS[git_untracked]} ]] && PL_SYMBOLS[git_untracked]="?"
 [[ -z ${PL_SYMBOLS[git_stash]} ]] && PL_SYMBOLS[git_stash]="§"
 [[ -z ${PL_SYMBOLS[git_ahead]} ]] && PL_SYMBOLS[git_ahead]="↑"
@@ -30,7 +30,7 @@ function git_segment {
     which git >/dev/null 2>&1 || return;  ## return if no git
 
     git_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-    
+
     [[ -z $git_branch  ]] && return;  ## return early if not a git branch
 
     local bg_color="$1"
@@ -39,7 +39,7 @@ function git_segment {
 
     if [ "$PL_GIT_STASH" = true ]; then
         local number_stash
-        number_stash="$(git stash list 2>/dev/null | grep -F -v -c 'fatal:' | tr -d '[:space:]')"
+        read -r number_stash < <(git stash list 2>/dev/null | wc -l)
         if [ ! "$number_stash" -eq 0 ]; then
             content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_stash]}$number_stash"
         fi
@@ -62,15 +62,17 @@ function git_segment {
 
     if [ "$PL_GIT_STAGED" = true ]; then
         local number_staged
-        number_staged="$(git diff --staged --name-only --diff-filter=AM 2> /dev/null | wc -l | tr -d '[:space:]')"
+        number_staged="$(git diff --staged --name-only --diff-filter=AM 2> /dev/null | wc -l)"
         if [ ! "$number_staged" -eq "0" ]; then
             content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_staged]}$number_staged"
         fi
     fi
 
+
+    # git diff --name-status into awk to pick out U, M items
     if [ "$PL_GIT_CONFLICTS" = true ]; then
         local number_conflicts
-        number_conflicts="$(git diff --name-only --diff-filter=U 2> /dev/null | wc -l | tr -d '[:space:]')"
+        number_conflicts="$(git diff --name-only --diff-filter=U 2> /dev/null | wc -l)"
         if [ ! "$number_conflicts" -eq "0" ]; then
             content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_conflicts]}$number_conflicts"
         fi
@@ -78,7 +80,7 @@ function git_segment {
 
     if [ "$PL_GIT_MODIFIED" = true ]; then
         local number_modified
-        number_modified="$(git diff --name-only --diff-filter=M 2> /dev/null | wc -l | tr -d '[:space:]')"
+        number_modified="$(git diff --name-only --diff-filter=M 2> /dev/null | wc -l)"
         if [ ! "$number_modified" -eq "0" ]; then
             content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_modified]}$number_modified"
         fi
@@ -86,7 +88,7 @@ function git_segment {
 
     if [ "$PL_GIT_UNTRACKED" = true ]; then
         local number_untracked
-        number_untracked="$(git ls-files --other --exclude-standard 2> /dev/null | wc -l | tr -d '[:space:]')"
+        number_untracked="$(git ls-files --other --exclude-standard 2> /dev/null | wc -l)"
         if [ ! "$number_untracked" -eq "0" ]; then
             content+=" ${PL_SYMBOLS[soft_separator]} ${PL_SYMBOLS[git_untracked]}$number_untracked"
         fi

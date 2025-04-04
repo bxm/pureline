@@ -69,7 +69,8 @@ function git_segment {
     fi
 
 
-    # git diff --name-status into awk to pick out U, M items
+    # TODO: git status --porcelain into awk to pick out U, M, AM items ... and ?? for untracked
+    #       and user read x y z <( ) to ingest that rather than $(  )
     if [ "$PL_GIT_CONFLICTS" = true ]; then
         local number_conflicts
         number_conflicts="$(git diff --name-only --diff-filter=U 2> /dev/null | wc -l)"
